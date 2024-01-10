@@ -1,0 +1,10 @@
+../Core/Src/USART.c:27:6:USART_start	1
+../Core/Src/USART.c:31:9:BX_haveData	2
+../Core/Src/USART.c:38:9:USART_getchar	3
+../Core/Src/USART.c:48:9:CALCULATE_CRC	4
+../Core/Src/USART.c:64:6:USART_fsend	6
+../Core/Src/USART.c:96:9:USART_GETFRAME	15
+../Core/Src/USART.c:162:6:ParseCommand	11
+../Core/Src/USART.c:202:6:ShowArchivalData	8
+../Core/Src/USART.c:217:6:HAL_UART_TxCpltCallback	4
+../Core/Src/USART.c:228:6:HAL_UART_RxCpltCallback	3
