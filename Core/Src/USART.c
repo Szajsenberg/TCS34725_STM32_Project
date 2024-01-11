@@ -2,7 +2,7 @@
  * USART.c
  *
  *  Created on: Jan 3, 2024
- *      Author: Oski
+ *      Author: Oskar_W
  */
 
 #include "USART.h"
@@ -120,7 +120,7 @@ uint8_t USART_GETFRAME(char *buf){
 				break;
 			}
 
-			if(FRAME_IDX>=MAX_FRAME_SIZE-4){
+			if(FRAME_IDX>=MAX_FRAME_SIZE){
 				USART_fsend("FRAME RANGE EXCEEDED;");
 				break;
 			}

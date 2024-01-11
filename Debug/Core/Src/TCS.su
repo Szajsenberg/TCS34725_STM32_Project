@@ -1,6 +1,7 @@
-../Core/Src/TCS.c:15:6:I2C_Write8BIT	32	static
-../Core/Src/TCS.c:25:9:I2C_Read8BIT	32	static
-../Core/Src/TCS.c:37:10:I2C_Read16BIT	32	static
-../Core/Src/TCS.c:53:10:I2C_GetColor	24	static
-../Core/Src/TCS.c:74:6:I2C_SetGain	16	static
-../Core/Src/TCS.c:80:6:I2C_RGBCTime	16	static
+../Core/Src/TCS.c:16:6:I2C_Write8BIT	24	static
+../Core/Src/TCS.c:26:9:I2C_Read8BIT	24	static
+../Core/Src/TCS.c:37:10:I2C_Read16BIT	24	static
+../Core/Src/TCS.c:52:10:I2C_GetColor	24	static
+../Core/Src/TCS.c:73:6:I2C_RGBCTime	16	static
+../Core/Src/TCS.c:80:6:HAL_I2C_MasterTxCpltCallback	16	static
+../Core/Src/TCS.c:84:6:HAL_I2C_MasterRxCpltCallback	16	static

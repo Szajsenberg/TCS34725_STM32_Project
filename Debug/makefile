@@ -60,8 +60,8 @@ all: main-build
 main-build: TCS34725_3.elf secondary-outputs
 
 # Tool invocations
-TCS34725_3.elf TCS34725_3.map: $(OBJS) $(USER_OBJS) D:\CubeIDE_Projects\TCS34725_3\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "TCS34725_3.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\CubeIDE_Projects\TCS34725_3\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TCS34725_3.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+TCS34725_3.elf TCS34725_3.map: $(OBJS) $(USER_OBJS) C:\Users\Oski\Desktop\TCS34725_Project\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "TCS34725_3.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Oski\Desktop\TCS34725_Project\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TCS34725_3.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

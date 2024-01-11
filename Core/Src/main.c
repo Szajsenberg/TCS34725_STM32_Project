@@ -52,7 +52,7 @@ UART_HandleTypeDef huart2;
 
 uint8_t LIVE_TOGGLE=0;
 uint8_t PREVIEW_TOGGLE=0;
-uint16_t Delay=500;
+uint16_t Delay=10000;
 
 uint8_t ARCHIVED_DATA[1200][3]={{-1,-1,-1}};
 __IO int ARCHIVE_RS=0;
@@ -144,14 +144,15 @@ int main(void)
 		  FRAME[0]=0;
 	  }
 	  if(LIVE_TOGGLE==1 && HAL_GetTick() % Delay == 0){
-		  uint8_t r=I2C_GetColor(RED);
-		  uint8_t g=I2C_GetColor(GREEN);
-		  uint8_t b=I2C_GetColor(BLUE);
+		  //uint8_t r=I2C_GetColor(RED);
+		  //uint8_t g=I2C_GetColor(GREEN);
+		  //uint8_t b=I2C_GetColor(BLUE);
 
-		  ADD_ARCHIVE_DATA(r,g,b);
+		  //ADD_ARCHIVE_DATA(r,g,b);
 
-		  if(PREVIEW_TOGGLE==1)
-			  USART_fsend("R= %d\tG= %d\tB= %d;",r,g,b);
+		  //if(PREVIEW_TOGGLE==1)
+			  //USART_fsend("R= %d\tG= %d\tB= %d;",r,g,b);
+		USART_fsend("ID=0x%02x",I2C_Read8BIT(TCS34725_ID));
 	  }
   }
   /* USER CODE END 3 */
