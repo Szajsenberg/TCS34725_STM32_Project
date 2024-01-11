@@ -50,7 +50,8 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-uint8_t LIVE_TOGGLE;
+uint8_t LIVE_TOGGLE=0;
+uint8_t PREVIEW_TOGGLE=0;
 uint16_t Delay=500;
 
 uint8_t ARCHIVED_DATA[1200][3]={{-1,-1,-1}};
@@ -70,6 +71,13 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void ADD_ARCHIVE_DATA(uint8_t r,uint8_t g,uint8_t b){
+	  ARCHIVED_DATA[ARCHIVE_RS][0]=r;
+	  ARCHIVED_DATA[ARCHIVE_RS][1]=g;
+	  ARCHIVED_DATA[ARCHIVE_RS][2]=b;
+	  ARCHIVE_RS++;
+	  if(ARCHIVE_RS >= 1200) ARCHIVE_RS=0;
+}
 /* USER CODE END 0 */
 
 /**
@@ -106,7 +114,7 @@ int main(void)
 
   //########	Inicjalizacja czujnika	########
 
-  HAL_GPIO_WritePin(TCSLED_GPIO_Port, TCSLED_Pin, GPIO_PIN_RESET); //Wyłączenie diody led
+  //HAL_GPIO_WritePin(TCSLED_GPIO_Port, TCSLED_Pin, GPIO_PIN_RESET); //Wyłączenie diody led
 
   I2C_Write8BIT(ATIME_REG,0); //Ustawienie czasu RGBC
   I2C_Write8BIT(CONTROL_REG,0); //Ustawienie Gainu
@@ -119,14 +127,6 @@ int main(void)
   USART_fsend("Hello User!;");
   char FRAME[MAX_FRAME_SIZE]={""};
 
-  void ADD_ARCHIVE_DATA(uint8_t r,uint8_t g,uint8_t b){
-		  ARCHIVED_DATA[ARCHIVE_RS][0]=r;
-		  ARCHIVED_DATA[ARCHIVE_RS][1]=g;
-		  ARCHIVED_DATA[ARCHIVE_RS][2]=b;
-		  ARCHIVE_RS++;
-		  if(ARCHIVE_RS >= 1200) ARCHIVE_RS=0;
-  }
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -136,22 +136,22 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if(BX_haveData()==1){
-		USART_GETFRAME(FRAME);
-	  }
+	  if(BX_haveData()==1)
+		  USART_GETFRAME(FRAME);
 
 	  if(strlen(FRAME)!=0){
 		  ParseCommand(FRAME);
 		  FRAME[0]=0;
 	  }
-
 	  if(LIVE_TOGGLE==1 && HAL_GetTick() % Delay == 0){
 		  uint8_t r=I2C_GetColor(RED);
 		  uint8_t g=I2C_GetColor(GREEN);
 		  uint8_t b=I2C_GetColor(BLUE);
 
 		  ADD_ARCHIVE_DATA(r,g,b);
-		  USART_fsend("R= %d\tG= %d\tB= %d;",r,g,b);
+
+		  if(PREVIEW_TOGGLE==1)
+			  USART_fsend("R= %d\tG= %d\tB= %d;",r,g,b);
 	  }
   }
   /* USER CODE END 3 */

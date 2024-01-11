@@ -12,8 +12,10 @@
 
 extern UART_HandleTypeDef huart2;
 extern uint8_t LIVE_TOGGLE;
+extern uint8_t PREVIEW_TOGGLE;
 extern uint16_t Delay;
 extern uint8_t ARCHIVED_DATA[1200][3];
+
 
 uint8_t USART_TxBuf[USART_TXBUF_LEN];
 uint8_t USART_RxBuf[MAX_FRAME_SIZE];
@@ -72,7 +74,7 @@ void USART_fsend(char* format,...){ // Funkcja odpowiedzialna za przesyłanie te
 	idx=USART_TX_Empty; // Przypisanie do idx wartości wskaźnika
 
 	uint8_t CHECKSUM=CALCULATE_CRC(tmp_rs, strlen(tmp_rs));
-	sprintf(FRAME,"%c%s%02x%c\n\r",STX,tmp_rs,CHECKSUM,ETB);
+	sprintf(FRAME,"%c%s%02x%c\r\n",STX,tmp_rs,CHECKSUM,ETB);
 
 	for(int i=0;i<strlen(FRAME);i++){
 		USART_TxBuf[idx]=FRAME[i]; //Przypisujemy do bufora znaki z tmp_rs
@@ -102,7 +104,7 @@ uint8_t USART_GETFRAME(char *buf){
 
 	switch(ZNAK){
 	case STX:
-		FRAME_STATE=1; //DO POPRAWY
+		FRAME_STATE=1;
 		FRAME_IDX=0;
 		FRAME[FRAME_IDX]=ZNAK;
 		FRAME_IDX++;
@@ -118,6 +120,11 @@ uint8_t USART_GETFRAME(char *buf){
 				break;
 			}
 
+			if(FRAME_IDX>=MAX_FRAME_SIZE-4){
+				USART_fsend("FRAME RANGE EXCEEDED;");
+				break;
+			}
+
 			if(FRAME[FRAME_IDX-4]==SEPARATOR){
 				char GIVEN_CRC[3]={""};
 				char CALC_CRC[3]={""};
@@ -125,7 +132,7 @@ uint8_t USART_GETFRAME(char *buf){
 				sprintf(CALC_CRC,"%02x",CALCULATE_CRC(FRAME+1,FRAME_IDX-4));
 				strncpy(GIVEN_CRC,FRAME+(FRAME_IDX-3),2);
 
-				if(tolower(GIVEN_CRC[0])==CALC_CRC[0] && tolower(GIVEN_CRC[1])==CALC_CRC[1]){
+				if(GIVEN_CRC[0]==CALC_CRC[0] && GIVEN_CRC[1]==CALC_CRC[1]){
 					for(int i=1;i<FRAME_IDX-3;i++){
 						buf[i-1]=FRAME[i];
 					}
@@ -149,11 +156,7 @@ uint8_t USART_GETFRAME(char *buf){
 	break;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
-	if(FRAME_IDX>=MAX_FRAME_SIZE-4){
-		USART_fsend("FRAME RANGE EXCEEDED;");
-		FRAME_IDX=0;
-		FRAME_STATE=0;
-	}
+
 	return 0;
 }
 
@@ -162,16 +165,27 @@ uint8_t USART_GETFRAME(char *buf){
 void ParseCommand(char *buf){
 	char * commBuff = strtok(buf,";");
 	while(commBuff!=NULL){
-		if(strncmp(commBuff,"LIVE",4)==0){
+		if(strncmp(commBuff,"START",5)==0){
 			LIVE_TOGGLE=1;
+			USART_fsend("STARTED!;");
 		}
 		else if(strncmp(commBuff,"STOP",4)==0){
 			LIVE_TOGGLE=0;
 			USART_fsend("STOPPED!;");
-
+		}
+		else if(strncmp(commBuff,"PREVIEW[ON]",12)==0){
+			PREVIEW_TOGGLE=1;
+			USART_fsend("PREVIEW TURNED ON!;");
+		}
+		else if(strncmp(commBuff,"PREVIEW[OFF]",12)==0){
+			PREVIEW_TOGGLE=0;
+			USART_fsend("PREVIEW TURNED OFF!;");
 		}
 		else if (strncmp(commBuff, "SETINTERVAL[", 12) == 0 && buf[strlen(buf) - 1] == ']'){
-			if(atoi(buf + 12)<3){
+			if(atoi(buf + 12)==0){
+				USART_fsend("WRONG INTERVAL VALUE;");
+			}
+			else if(atoi(buf + 12)<3){
 				USART_fsend("GIVEN VALUE IS TOO LOW: %d ;", atoi(buf + 12));
 			}
 			else if(atoi(buf + 12)>65535){
@@ -203,11 +217,18 @@ void ShowArchivalData(uint16_t x,uint16_t y){
 	if((x > 0 && x <= 1200) && (y > 0 && y <= 1200)){
 		if(x>y){
 			for(int i=x-1;i>=y-1;i--){
-				USART_fsend("%d| \tR= %d\tG= %d\tB= %d;",i,ARCHIVED_DATA[i][0],ARCHIVED_DATA[i][1],ARCHIVED_DATA[i][2]);
+				if(ARCHIVED_DATA[i][0]>=0 && ARCHIVED_DATA[i][0]<257)
+					USART_fsend("DATA NOT AVAIBLE AT INDEX=%d",i);
+				else
+					USART_fsend("%d| \tR= %d\tG= %d\tB= %d;",i,ARCHIVED_DATA[i][0],ARCHIVED_DATA[i][1],ARCHIVED_DATA[i][2]);
 			}
-		}else{
+		}
+		else{
 			for(int i=x-1;i<=y-1;i++){
-				USART_fsend("%d| \tR= %d\tG= %d\tB= %d;",i,ARCHIVED_DATA[i][0],ARCHIVED_DATA[i][1],ARCHIVED_DATA[i][2]);
+				if(ARCHIVED_DATA[i][0]>=0 && ARCHIVED_DATA[i][0]<257)
+					USART_fsend("DATA NOT AVAIBLE AT INDEX=%d",i);
+				else
+					USART_fsend("%d| \tR= %d\tG= %d\tB= %d;",i,ARCHIVED_DATA[i][0],ARCHIVED_DATA[i][1],ARCHIVED_DATA[i][2]);
 			}
 		}
 	}else{USART_fsend("WRONG PARAMETER!");}
