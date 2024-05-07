@@ -1,3 +1,2 @@
 
-- USART communication with my own communication protocol
-- Connection with TCS34725 trough I2C 
+Custom communication protocol based on UART and TCS34725 handling via I2C
